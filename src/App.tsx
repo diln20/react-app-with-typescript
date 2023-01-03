@@ -1,54 +1,27 @@
-import  { useEffect, useState,useRef } from 'react';
-import './App.css';
-import List from './components/List';
-import Form from './components/Form';
-import { Sub, SubsRenponseFromApi } from './types';
-import axios from 'axios';
+import { useEffect, useState, useRef } from "react";
+import "./App.css";
+import List from "./components/List";
+import Form from "./components/Form";
+import { Sub } from "./types";
+import { getAllSubs } from "./services/getAllSubs";
 
 interface AppState {
-  subs: Array<Sub>
-  newSubsNumber: number
+  subs: Array<Sub>;
+  newSubsNumber: number;
 }
 
 function App() {
-  const [subs, setSubs] = useState<AppState["subs"]>([])
-  const [newSubsNumber, setNewSubsNumber] = useState<AppState["newSubsNumber"]>(0)
-  const divRef= useRef<HTMLDivElement>(null)
-
+  const [newSubsNumber, setNewSubsNumber] =
+    useState<AppState["newSubsNumber"]>(0);
+  const divRef = useRef<HTMLDivElement>(null);
+  const [subs, setSubs] = useState<AppState["subs"]>([]);
   useEffect(() => {
-    const fetchSubs = (): Promise<SubsRenponseFromApi>=>{
-      return axios.get("http://localhost:3001/subs").then(res => res.data)
-    }
-
-    const mapFromApiToSubs = (apiResponse: SubsRenponseFromApi): 
-      Array<Sub> => {
-      return apiResponse.map((subFromApi) => {
-        const {
-          nick,
-          months: subMonths,
-          profileUrl: avatar,
-          description,
-        } = subFromApi;
-        return {
-          nick,
-          subMonths,
-          avatar,
-          description,
-        };
-      });
-    }
-
-    fetchSubs()
-      .then(mapFromApiToSubs)
-      .then(setSubs)
-    
-  }, [])
-
+    getAllSubs().then(setSubs);
+  }, []);
   const handleNewSub = (newSub: Sub): void => {
-    setSubs(subs => [...subs, newSub])
-    setNewSubsNumber(newSubsNumber + 1)
-  }
-  
+    setSubs((subs) => [...subs, newSub]);
+    setNewSubsNumber(newSubsNumber + 1);
+  };
 
   return (
     <div className="App" ref={divRef}>
